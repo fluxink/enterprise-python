@@ -83,6 +83,7 @@ class RelCrudTest:
             RelationalSwap(
                 trade_id=f"T{i + 1}",
                 trade_type="Swap",
+                notional=100*i,
                 legs=[fixed_legs[i], floating_legs[i]],
             )
             for i in range(0, 2)
@@ -185,6 +186,20 @@ class RelCrudTest:
                         f"leg_type[0]={trade.legs[0].leg_type} leg_ccy[0]={trade.legs[0].leg_ccy} "
                         f"leg_type[1]={trade.legs[1].leg_type} leg_ccy[1]={trade.legs[1].leg_ccy}\n"
                         for trade in gbp_fixed_swaps
+                    ]
+                )
+
+                notional_filter = list(
+                    session.query(RelationalSwap)
+                    .where(RelationalSwap.notional >= 200)
+                    .order_by(RelationalSwap.trade_id)
+                )
+
+                result += "Swaps where notional attribute >= 200:\n" + "".join(
+                    [
+                        f"    trade_id={trade.trade_id} trade_type={trade.trade_type} "
+                        f"notional={trade.notional}\n"
+                        for trade in notional_filter
                     ]
                 )
 
