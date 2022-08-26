@@ -64,7 +64,7 @@ class TreeCrudTest:
             TreeSwap(
                 trade_id=f"T{i+1}",
                 trade_type="Swap",
-                notional=i*100,
+                notional=(i+1)*100,
                 legs=[
                     TreeLeg(leg_type="Fixed", leg_ccy=ccy_list[i % ccy_count]),
                     TreeLeg(leg_type="Floating", leg_ccy="EUR"),
@@ -74,7 +74,8 @@ class TreeCrudTest:
         ]
         bonds = [
             TreeBond(
-                trade_id=f"T{i+1}", trade_type="Bond", bond_ccy=ccy_list[i % ccy_count]
+                trade_id=f"T{i+1}", trade_type="Bond", bond_ccy=ccy_list[i % ccy_count],
+                notional=(i+1)*100,
             )
             for i in range(2, 3)
         ]
@@ -104,8 +105,6 @@ class TreeCrudTest:
             ]
         )
 
-        # notional_filter = TreeTrade.objects(notional)
-
         # Retrieve all swaps but skip bonds
         all_swaps = TreeSwap.objects.order_by("trade_id")
 
@@ -114,6 +113,17 @@ class TreeCrudTest:
             [
                 f"    trade_id={trade.trade_id} trade_type={trade.trade_type}\n"
                 for trade in all_swaps
+            ]
+        )
+
+        
+        notional_filter = TreeTrade.objects(notional__gte=200)
+
+        result += "Trades where notional attribute >= 200:\n" + "".join(
+            [
+                f"    trade_id={trade.trade_id} trade_type={trade.trade_type} "
+                f"notional={trade.notional}\n"
+                for trade in notional_filter
             ]
         )
 
